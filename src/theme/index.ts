@@ -96,9 +96,66 @@ const theme = createTheme({
             },
         },
         MuiButton: {
+            defaultProps: {
+                disableElevation: true,
+            },
             styleOverrides: {
                 root: {
-                    borderRadius: 8,
+                    borderRadius: 10,
+                    padding: '8px 22px',
+                    fontWeight: 600,
+                    letterSpacing: '-0.1px',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                        transform: 'translateY(-1.5px)',
+                    },
+                    '&:active': {
+                        transform: 'translateY(0) scale(0.97)',
+                    },
+                },
+                containedPrimary: {
+                    background: 'rgba(88, 166, 255, 0.12)',
+                    border: '1px solid rgba(88, 166, 255, 0.25)',
+                    color: '#58a6ff',
+                    boxShadow: '0 4px 30px rgba(0, 0, 0, 0.15)',
+                    '&:hover': {
+                        background: 'rgba(88, 166, 255, 0.2)',
+                        border: '1px solid rgba(88, 166, 255, 0.45)',
+                        boxShadow: '0 4px 30px rgba(88, 166, 255, 0.25)',
+                    },
+                },
+                containedSuccess: {
+                    background: 'rgba(46, 160, 67, 0.12)',
+                    border: '1px solid rgba(46, 160, 67, 0.25)',
+                    color: '#3fb950',
+                    boxShadow: '0 4px 30px rgba(0, 0, 0, 0.15)',
+                    '&:hover': {
+                        background: 'rgba(46, 160, 67, 0.22)',
+                        border: '1px solid rgba(46, 160, 67, 0.45)',
+                        boxShadow: '0 4px 30px rgba(46, 160, 67, 0.25)',
+                    },
+                },
+                containedError: {
+                    background: 'rgba(248, 81, 73, 0.12)',
+                    border: '1px solid rgba(248, 81, 73, 0.25)',
+                    color: '#f85149',
+                    boxShadow: '0 4px 30px rgba(0, 0, 0, 0.15)',
+                    '&:hover': {
+                        background: 'rgba(248, 81, 73, 0.22)',
+                        border: '1px solid rgba(248, 81, 73, 0.45)',
+                        boxShadow: '0 4px 30px rgba(248, 81, 73, 0.25)',
+                    },
+                },
+                outlinedPrimary: {
+                    borderColor: 'rgba(88, 166, 255, 0.25)',
+                    color: '#58a6ff',
+                    backgroundColor: 'rgba(88, 166, 255, 0.03)',
+                    '&:hover': {
+                        borderColor: '#58a6ff',
+                        backgroundColor: 'rgba(88, 166, 255, 0.08)',
+                    },
                 },
             },
         },

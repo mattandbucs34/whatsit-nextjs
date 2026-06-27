@@ -13,7 +13,7 @@ import { ITopic } from '@/interfaces/ITopic';
 const TopicsPageClient = ({ topics }: { topics: ITopic[] }) => {
     return (
         <Container>
-            <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
+            <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'} mb={4}>
                 <Typography component={'h1'} fontSize={'3rem'}>Topics</Typography>
                 <Button
                     component={NextLink}
