@@ -6,3 +6,7 @@ export interface ITopic {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface ITopicWithPosts extends ITopic {
+    posts: IPost[];
+}

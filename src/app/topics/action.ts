@@ -1,6 +1,6 @@
 'use server';
 
-import { addTopic, updateTopic } from '@/db/queries/topics';
+import { addTopic, deleteTopic, updateTopic } from '@/db/queries/topics';
 import { TopicInput, topicSchema } from '@/lib/validations/topic';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -32,4 +32,12 @@ export const updateTopicAction = async (id: number, data: TopicInput) => {
     revalidatePath(`/topics/${id}`);
 
     redirect(`/topics/${updatedTopic.id}`);
+};
+
+export const deleteTopicAction = async (id: number) => {
+    await deleteTopic(id);
+
+    revalidatePath('/topics');
+
+    redirect('/topics');
 };

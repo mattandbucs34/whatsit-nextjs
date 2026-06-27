@@ -1,12 +1,15 @@
 'use client';
 
+import { useState } from 'react';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import ArrowBackRounded from '@mui/icons-material/ArrowBackRounded';
 import NextLink from 'next/link';
 import { ITopicWithPosts } from '@/interfaces/ITopic';
+import { DeleteConfirmDialog } from '@/components/ui/DeleteConfirmDialog';
+import { deleteTopicAction } from '../action';
 
 
 interface SingleTopicPageClientProps {
@@ -14,6 +17,20 @@ interface SingleTopicPageClientProps {
 }
 
 const SingleTopicPageClient = ({ topic }: SingleTopicPageClientProps) => {
+    const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+    const handleConfirmDelete = async () => {
+        setIsDeleting(true);
+        try {
+            await deleteTopicAction(topic.id);
+        } catch (err) {
+            console.error(err);
+            setIsDeleting(false);
+            setIsDeleteOpen(false);
+        }
+    };
+
     return (
         <Container maxWidth={'md'}>
             <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'} mb={4}>
@@ -26,7 +43,7 @@ const SingleTopicPageClient = ({ topic }: SingleTopicPageClientProps) => {
                         Edit Topic
                     </Button>
 
-                    <Button variant={'contained'} color={'error'}>
+                    <Button variant={'contained'} color={'error'} onClick={() => setIsDeleteOpen(true)}>
                         Delete Topic
                     </Button>
                 </Stack>
@@ -64,6 +81,15 @@ const SingleTopicPageClient = ({ topic }: SingleTopicPageClientProps) => {
                     </Typography>
                 )}
             </Stack>
+
+            <DeleteConfirmDialog
+                open={isDeleteOpen}
+                title={'Delete Topic'}
+                description={`Are you sure you want to delete "${topic.title}"? This action cannot be undone and will permanently delete all associated posts.`}
+                onClose={() => setIsDeleteOpen(false)}
+                onConfirm={handleConfirmDelete}
+                isLoading={isDeleting}
+            />
         </Container>
     );
 };
