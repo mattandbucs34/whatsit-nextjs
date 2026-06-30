@@ -1,7 +1,7 @@
 'use server';
 
 import { addTopic, deleteTopic, updateTopic } from '@/db/queries/topics';
-import { createPost } from '@/db/queries/posts';
+import { createPost, updatePost, deletePost } from '@/db/queries/posts';
 import { TopicInput, topicSchema } from '@/lib/validations/topic';
 import { PostInput, postSchema } from '@/lib/validations/post';
 import { revalidatePath } from 'next/cache';
@@ -60,4 +60,27 @@ export const createPostAction = async (topicId: number, data: PostInput) => {
     revalidatePath(`/topics/${topicId}`);
 
     return newPost;
+};
+
+export const updatePostAction = async (postId: number, topicId: number, data: PostInput) => {
+    const result = postSchema.safeParse(data);
+
+    if (!result.success) {
+        throw new Error('Invalid input data');
+    }
+
+    const updatedPost = await updatePost(postId, result.data);
+
+    revalidatePath(`/topics/${topicId}`);
+    revalidatePath(`/topics/${topicId}/posts/${postId}`);
+
+    return updatedPost;
+};
+
+export const deletePostAction = async (postId: number, topicId: number) => {
+    await deletePost(postId);
+
+    revalidatePath(`/topics/${topicId}`);
+
+    redirect(`/topics/${topicId}`);
 };
