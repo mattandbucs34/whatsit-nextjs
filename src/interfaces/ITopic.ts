@@ -1,3 +1,5 @@
+import { IPost } from './IPost';
+
 export interface ITopic {
     id: number;
     title: string;

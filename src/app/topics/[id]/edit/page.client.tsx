@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import { topicSchema, TopicInput } from '@/lib/validations/topic';
 import { updateTopicAction } from '../../action';
 import { ITopic } from '@/interfaces/ITopic';
+import NextLink from 'next/link';
 
 interface EditTopicPageClientProps {
     topic: ITopic;
@@ -69,14 +70,25 @@ const EditTopicPageClient = ({ topic }: EditTopicPageClientProps) => {
                     )}
                 />
 
-                <Button
-                    type={'submit'}
-                    variant={'contained'}
-                    color={'primary'}
-                    disabled={isSubmitting}
-                >
-                    Save Changes
-                </Button>
+                <Stack direction={'row'} spacing={2}>
+                    <Button
+                        type={'submit'}
+                        variant={'contained'}
+                        color={'primary'}
+                        disabled={isSubmitting}
+                    >
+                        Save Changes
+                    </Button>
+                    <Button
+                        component={NextLink}
+                        href={`/topics/${topic.id}`}
+                        variant={'outlined'}
+                        color={'primary'}
+                        disabled={isSubmitting}
+                    >
+                        Cancel
+                    </Button>
+                </Stack>
             </Stack>
         </Container>
     );
