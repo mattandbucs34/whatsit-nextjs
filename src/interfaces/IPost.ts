@@ -1,3 +1,5 @@
+import { IComment } from '@/interfaces/IComment';
+
 export interface IPost {
     id: number;
     title: string;
