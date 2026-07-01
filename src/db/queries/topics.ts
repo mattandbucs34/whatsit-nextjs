@@ -11,7 +11,15 @@ export const getTopic = async (id: number) => {
     return await db.query.topics.findFirst({
         where: eq(topics.id, id),
         with: {
-            posts: true,
+            posts: {
+                with: {
+                    comments: {
+                        columns: {
+                            id: true,
+                        }
+                    }
+                }
+            },
         }
     });
 };
