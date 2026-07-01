@@ -18,7 +18,18 @@ const eslintConfig = defineConfig([
         files: ['**/*.ts', '**/*.tsx'],
         plugins: { '@stylistic': stylistic },
         rules: {
-            'no-unused-vars': ['error', { vars: 'all', args: 'after-used' }],
+            'no-unused-vars': ['error', {
+                vars: 'all',
+                args: 'after-used',
+                argsIgnorePattern: '^_',
+                varsIgnorePattern: '^_',
+            }],
+            '@typescript-eslint/no-unused-vars': ['error', {
+                vars: 'all',
+                args: 'after-used',
+                argsIgnorePattern: '^_',
+                varsIgnorePattern: '^_',
+            }],
             'semi': ['error', 'always'],
             'comma-dangle': ['warn', {
                 arrays: 'only-multiline',

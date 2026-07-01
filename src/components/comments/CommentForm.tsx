@@ -12,7 +12,7 @@ import { IComment } from '@/interfaces/IComment';
 
 interface CommentFormProps {
     postId: number;
-    onCommentAdded: (comment: IComment) => void;
+    onCommentAdded: (_comment: IComment) => void;
 }
 
 export const CommentForm = ({ postId, onCommentAdded }: CommentFormProps) => {

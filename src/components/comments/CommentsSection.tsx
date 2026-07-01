@@ -58,7 +58,7 @@ export const CommentsSection = ({ postId, currentUser }: CommentsSectionProps) =
     // Load initial page
     useEffect(() => {
         loadMoreComments(true);
-    }, [postId]);
+    }, [postId, loadMoreComments]);
 
     // Intersection Observer callback ref for infinite scrolling
     const lastCommentElementRef = useCallback((node: HTMLDivElement | null) => {
@@ -123,7 +123,7 @@ export const CommentsSection = ({ postId, currentUser }: CommentsSectionProps) =
                 {!hasMore && comments.length > 0 && (
                     <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
                         <Typography variant={'caption'} color={'text.secondary'}>
-                            You've reached the end of the comments.
+                            You have reached the end of the comments.
                         </Typography>
                     </Box>
                 )}
