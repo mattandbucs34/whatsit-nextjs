@@ -4,20 +4,23 @@ import CssBaseline from '@mui/material/CssBaseline';
 import theme from '@/theme';
 import { Navbar } from '@/components/ui/Navbar';
 import Box from '@mui/material/Box';
+import { auth } from '@/auth';
 
 export const metadata = {
   title: 'Whatsit',
   description: 'A modern discussion and sharing platform',
 };
 
-const RootLayout = ({ children }: { children: React.ReactNode }) => {
+const RootLayout = async ({ children }: { children: React.ReactNode }) => {
+  const session = await auth();
+
   return (
     <html lang={'en'}>
       <body>
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Navbar />
+            <Navbar session={session} />
             <Box component={'main'} py={4}>
               {children}
             </Box>

@@ -17,7 +17,7 @@ import { DeleteConfirmDialog } from '@/components/ui/DeleteConfirmDialog';
 import BackButton from '@/components/ui/buttons/BackButton';
 import DeleteButton from '@/components/ui/buttons/DeleteButton';
 import { postSchema, PostInput } from '@/lib/validations/post';
-import { updatePostAction, deletePostAction } from '../../../action';
+import { updatePostAction, deletePostAction } from '@/app/topics/action';
 
 // Strong typing for the post object returned from Drizzle query
 interface SinglePostPageClientProps {

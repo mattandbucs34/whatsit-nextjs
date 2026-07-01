@@ -31,8 +31,8 @@ export const createPost = async (data: {
     title: string;
     body: string;
     topicId: number;
+    userId: number;
 }) => {
-    const guestUser = await getOrCreateGuestUser();
     const now = new Date().toISOString();
 
     const result = await db
@@ -41,7 +41,7 @@ export const createPost = async (data: {
             title: data.title,
             body: data.body,
             topicId: data.topicId,
-            userId: guestUser.id, // associate with the guest user
+            userId: data.userId,
             createdAt: now,
             updatedAt: now,
         })
