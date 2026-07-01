@@ -1,6 +1,7 @@
 import { getPost } from '@/db/queries/posts';
 import { notFound } from 'next/navigation';
 import SinglePostPageClient from './page.client';
+import { auth } from '@/auth';
 
 interface PageProps {
     params: Promise<{
@@ -18,10 +19,18 @@ const PostDetailPage = async ({ params }: PageProps) => {
         notFound();
     }
 
+    const session = await auth();
+    const currentUser = session?.user ? {
+        id: session.user.id,
+        email: session.user.email || '',
+        role: session.user.role,
+    } : null;
+
     return (
         <SinglePostPageClient 
             post={post} 
             topicId={Number(topicId)} 
+            currentUser={currentUser}
         />
     );
 };

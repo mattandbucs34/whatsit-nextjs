@@ -20,19 +20,40 @@ import DeleteButton from '@/components/ui/buttons/DeleteButton';
 import BackButton from '@/components/ui/buttons/BackButton';
 import { deleteTopicAction, createPostAction } from '../action';
 import { postSchema, PostInput } from '@/lib/validations/post';
+import { CommentsSection } from '@/components/comments/CommentsSection';
+import { IPost } from '@/interfaces/IPost';
 
 
 interface SingleTopicPageClientProps {
-    topic: ITopicWithPosts;
+    topic: Omit<ITopicWithPosts, 'posts'> & {
+        posts: (IPost & {
+            comments?: {
+                id: number;
+            }[];
+        })[];
+    };
+    currentUser: {
+        id: string;
+        email: string;
+        role: string;
+    } | null;
 }
 
-const SingleTopicPageClient = ({ topic }: SingleTopicPageClientProps) => {
+const SingleTopicPageClient = ({ topic, currentUser }: SingleTopicPageClientProps) => {
     const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [isExpanded, setIsExpanded] = useState<boolean>(false);
     const [showButton, setShowButton] = useState<boolean>(false);
     const [isComposerOpen, setIsComposerOpen] = useState<boolean>(false);
+    const [expandedComments, setExpandedComments] = useState<{ [key: number]: boolean }>({});
     const descriptionRef = useRef<HTMLParagraphElement>(null);
+
+    const toggleComments = (postId: number) => {
+        setExpandedComments((prev) => ({
+            ...prev,
+            [postId]: !prev[postId],
+        }));
+    };
 
     const { control, handleSubmit, reset, formState: { errors: postErrors, isSubmitting: isPostSubmitting } } = useForm<PostInput>({
         resolver: zodResolver(postSchema),
@@ -95,10 +116,12 @@ const SingleTopicPageClient = ({ topic }: SingleTopicPageClientProps) => {
             <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'} mb={4}>
                 <BackButton href={'/topics'} />
 
-                <Stack direction={'row'} spacing={1}>
-                    <EditButton href={`/topics/${topic.id}/edit`} />
-                    <DeleteButton onClick={() => setIsDeleteOpen(true)} />
-                </Stack>
+                {currentUser?.role === 'admin' && (
+                    <Stack direction={'row'} spacing={1}>
+                        <EditButton href={`/topics/${topic.id}/edit`} />
+                        <DeleteButton onClick={() => setIsDeleteOpen(true)} />
+                    </Stack>
+                )}
             </Stack>
 
             <Box
@@ -145,13 +168,15 @@ const SingleTopicPageClient = ({ topic }: SingleTopicPageClientProps) => {
                 <Typography variant={'h4'} component={'h2'} gutterBottom={false}>
                     Posts
                 </Typography>
-                <Button
-                    variant={'contained'}
-                    color={'primary'}
-                    onClick={() => setIsComposerOpen(!isComposerOpen)}
-                >
-                    {isComposerOpen ? 'Cancel' : 'New Post'}
-                </Button>
+                {currentUser !== null && (
+                    <Button
+                        variant={'contained'}
+                        color={'primary'}
+                        onClick={() => setIsComposerOpen(!isComposerOpen)}
+                    >
+                        {isComposerOpen ? 'Cancel' : 'New Post'}
+                    </Button>
+                )}
             </Stack>
 
             <Collapse in={isComposerOpen} sx={{ mb: 4 }}>
@@ -278,6 +303,22 @@ const SingleTopicPageClient = ({ topic }: SingleTopicPageClientProps) => {
                                 >
                                     {post.body}
                                 </Typography>
+
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                                    <Button
+                                        size={'small'}
+                                        onClick={() => toggleComments(post.id)}
+                                        sx={{ textTransform: 'none', color: 'primary.main', fontWeight: 600 }}
+                                    >
+                                        {expandedComments[post.id] ? 'Hide Comments' : `Comments (${post.comments?.length || 0})`}
+                                    </Button>
+                                </Box>
+
+                                <Collapse in={!!expandedComments[post.id]} timeout={'auto'} unmountOnExit={true}>
+                                    <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                                        <CommentsSection postId={post.id} currentUser={currentUser} />
+                                    </Box>
+                                </Collapse>
                             </CardContent>
                         </Card>
                     ))}

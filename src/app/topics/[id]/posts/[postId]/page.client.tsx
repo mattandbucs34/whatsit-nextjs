@@ -18,6 +18,7 @@ import BackButton from '@/components/ui/buttons/BackButton';
 import DeleteButton from '@/components/ui/buttons/DeleteButton';
 import { postSchema, PostInput } from '@/lib/validations/post';
 import { updatePostAction, deletePostAction } from '@/app/topics/action';
+import { CommentsSection } from '@/components/comments/CommentsSection';
 
 // Strong typing for the post object returned from Drizzle query
 interface SinglePostPageClientProps {
@@ -42,12 +43,22 @@ interface SinglePostPageClientProps {
         }[];
     };
     topicId: number;
+    currentUser: {
+        id: string;
+        email: string;
+        role: string;
+    } | null;
 }
 
-const SinglePostPageClient = ({ post, topicId }: SinglePostPageClientProps) => {
+const SinglePostPageClient = ({ post, topicId, currentUser }: SinglePostPageClientProps) => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+    const canEditOrDelete = currentUser !== null && (
+        currentUser.role === 'admin' ||
+        post.userId === parseInt(currentUser.id, 10)
+    );
 
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<PostInput>({
         resolver: zodResolver(postSchema),
@@ -90,7 +101,7 @@ const SinglePostPageClient = ({ post, topicId }: SinglePostPageClientProps) => {
                 <BackButton href={`/topics/${topicId}`} />
 
                 <Stack direction={'row'} spacing={1}>
-                    {!isEditing && (
+                    {canEditOrDelete && !isEditing && (
                         <>
                             <IconButton
                                 onClick={() => {
@@ -210,35 +221,7 @@ const SinglePostPageClient = ({ post, topicId }: SinglePostPageClientProps) => {
                 </CardContent>
             </Card>
 
-            {/* Comments Outline Section */}
-            <Typography variant={'h4'} sx={{ mt: 6, mb: 3, fontWeight: 700 }}>
-                Comments ({post.comments?.length || 0})
-            </Typography>
-
-            <Stack spacing={2} mb={6}>
-                {post.comments && post.comments.map((comment) => (
-                    <Card key={comment.id} variant={'outlined'} sx={{ background: 'rgba(22, 27, 34, 0.2)', border: '1px solid', borderColor: 'divider' }}>
-                        <CardContent>
-                            <Typography variant={'body2'} sx={{ mb: 1.5, whiteSpace: 'pre-wrap' }}>
-                                {comment.body}
-                            </Typography>
-                            <Typography variant={'caption'} color={'text.secondary'}>
-                                Comment by {comment.user?.email || 'guest@whatsit.com'} on {new Date(comment.createdAt).toLocaleDateString(undefined, {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                ))}
-
-                {(!post.comments || post.comments.length === 0) && (
-                    <Typography color={'text.secondary'}>
-                        No comments yet.
-                    </Typography>
-                )}
-            </Stack>
+            <CommentsSection postId={post.id} currentUser={currentUser} />
 
             <DeleteConfirmDialog
                 open={isDeleteOpen}
