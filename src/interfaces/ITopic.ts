@@ -7,7 +7,7 @@ export interface ITopic {
     flairId?: number | null;
     flair?: {
         id: number;
-        name: string;
+        name: string | null;
         color?: string | null;
     } | null;
     createdAt: string;

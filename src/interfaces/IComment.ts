@@ -5,4 +5,7 @@ export interface IComment {
     userId: number;
     createdAt: string;
     updatedAt: string;
+    user?: {
+        email: string;
+    } | null;
 }
