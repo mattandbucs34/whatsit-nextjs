@@ -32,10 +32,10 @@ jobs:
             - name: Install pnpm
               uses: pnpm/action-setup@v4
               with:
-                  version: latest
+                  version: 9
 
             - name: Install dependencies
-              run: pnpm install --no-frozen-lockfile
+              run: pnpm install
 
             - name: Run unit tests
               env:
@@ -52,7 +52,7 @@ jobs:
                   script: |
                       cd /var/www/whatsit-nextjs
                       git pull origin main
-                      pnpm install --no-frozen-lockfile
+                      pnpm install
                       npx drizzle-kit migrate
                       pnpm build
                       pm2 restart ecosystem.config.cjs --env production
