@@ -35,7 +35,7 @@ jobs:
                   version: latest
 
             - name: Install dependencies
-              run: pnpm install
+              run: pnpm install --no-frozen-lockfile
 
             - name: Run unit tests
               env:
@@ -52,7 +52,7 @@ jobs:
                   script: |
                       cd /var/www/whatsit-nextjs
                       git pull origin main
-                      pnpm install
+                      pnpm install --no-frozen-lockfile
                       npx drizzle-kit migrate
                       pnpm build
                       pm2 restart ecosystem.config.cjs --env production
