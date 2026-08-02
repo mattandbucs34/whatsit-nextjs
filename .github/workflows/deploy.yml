@@ -37,10 +37,10 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Run database migrations for CI testing
+            - name: Push database schema for CI testing
               env:
                   DATABASE_URL: postgres://whatsit_user:password123@localhost:5432/whatsit_test
-              run: npx drizzle-kit migrate
+              run: npx drizzle-kit push --force
 
             - name: Run unit tests
               env:
@@ -58,6 +58,6 @@ jobs:
                       cd /var/www/whatsit-nextjs
                       git pull origin main
                       pnpm install
-                      npx drizzle-kit migrate
+                      npx drizzle-kit push --force
                       pnpm build
                       pm2 restart ecosystem.config.cjs --env production
