@@ -5,6 +5,11 @@ export interface ITopic {
     title: string;
     description: string;
     flairId?: number | null;
+    flair?: {
+        id: number;
+        name: string;
+        color?: string | null;
+    } | null;
     createdAt: string;
     updatedAt: string;
 }

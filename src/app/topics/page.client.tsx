@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
 import { ITopic } from '@/interfaces/ITopic';
+import { FlairBadge } from '@/components/flairs/FlairBadge';
 
 const TopicsPageClient = ({ topics }: { topics: ITopic[] }) => {
     return (
@@ -29,9 +30,18 @@ const TopicsPageClient = ({ topics }: { topics: ITopic[] }) => {
                 {topics.map((topic) => (
                     <Card key={topic.id}>
                         <CardContent>
-                            <Typography variant={'h5'} component={'h2'} gutterBottom>
-                                {topic.title}
-                            </Typography>
+                            <Stack direction={'row'} spacing={1.5} alignItems={'center'} mb={1}>
+                                <Typography variant={'h5'} component={'h2'}>
+                                    {topic.title}
+                                </Typography>
+                                {topic.flair && (
+                                    <FlairBadge
+                                        name={topic.flair.name}
+                                        color={topic.flair.color}
+                                        size={'small'}
+                                    />
+                                )}
+                            </Stack>
                             <Typography variant={'body2'} color={'text.secondary'}>
                                 {topic.description}
                             </Typography>

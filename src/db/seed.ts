@@ -2,7 +2,7 @@
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import { db } from './index';
-import { topics, posts, comments, users } from './schema';
+import { topics, posts, comments, users, flairs } from './schema';
 import { eq } from 'drizzle-orm';
 import { faker } from '@faker-js/faker';
 
@@ -44,13 +44,47 @@ const getOrCreateUsers = async (now: string) => {
     return seededUsers;
 };
 
+const getOrCreateFlairs = async (now: string) => {
+    const targetFlairs = [
+        { name: 'Announcement', color: '#f85149' },
+        { name: 'Discussion', color: '#2ea44f' },
+        { name: 'Question', color: '#58A6FF' },
+        { name: 'Showcase', color: '#a371f7' },
+        { name: 'Bug Report', color: '#d29922' },
+        { name: 'News', color: '#db61a2' },
+    ];
+
+    const seededFlairs = [];
+    for (const flairData of targetFlairs) {
+        let flair = await db.query.flairs.findFirst({
+            where: eq(flairs.name, flairData.name),
+        });
+
+        if (!flair) {
+            const result = await db
+                .insert(flairs)
+                .values({
+                    name: flairData.name,
+                    color: flairData.color,
+                    createdAt: now,
+                    updatedAt: now,
+                })
+                .returning();
+            flair = result[0];
+        }
+        seededFlairs.push(flair);
+    }
+    return seededFlairs;
+};
+
 const seed = async () => {
     console.log('Starting seed process...');
     try {
         const now = new Date().toISOString();
 
-        // 1. Seed or retrieve users
+        // 1. Seed or retrieve users & flairs
         const seededUsers = await getOrCreateUsers(now);
+        const seededFlairs = await getOrCreateFlairs(now);
 
         // 2. Generate and seed 10 Topics
         console.log('Seeding 10 topics...');
@@ -62,9 +96,12 @@ const seed = async () => {
                 .join(' ')
                 .slice(0, 255);
 
+            const randomFlair = faker.helpers.arrayElement([...seededFlairs, null]);
+
             return {
                 title,
                 description: faker.lorem.paragraph().slice(0, 255),
+                flairId: randomFlair ? randomFlair.id : null,
                 createdAt: now,
                 updatedAt: now,
             };
@@ -80,7 +117,6 @@ const seed = async () => {
             for (let i = 0; i < 10; i++) {
                 const randomUser = faker.helpers.arrayElement(seededUsers);
                 
-                // Keep title and body short to obey the varchar(255) column limits in schema.ts
                 const rawTitle = faker.lorem.sentence({ min: 3, max: 6 });
                 const title = rawTitle.charAt(0).toUpperCase() + rawTitle.slice(1);
 

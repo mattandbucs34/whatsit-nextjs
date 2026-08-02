@@ -23,6 +23,7 @@ import { postSchema, PostInput } from '@/lib/validations/post';
 import { CommentsSection } from '@/components/comments/CommentsSection';
 import { IPost } from '@/interfaces/IPost';
 import { VoteControl } from '@/components/votes/VoteControl';
+import { FlairBadge } from '@/components/flairs/FlairBadge';
 
 
 interface SingleTopicPageClientProps {
@@ -136,9 +137,18 @@ const SingleTopicPageClient = ({ topic, currentUser }: SingleTopicPageClientProp
                     mb: 6,
                 }}
             >
-                <Typography variant={'h2'} component={'h1'} gutterBottom={true} sx={{ fontWeight: 800 }}>
-                    {topic.title}
-                </Typography>
+                <Stack direction={'row'} spacing={2} alignItems={'center'} mb={1}>
+                    <Typography variant={'h2'} component={'h1'} sx={{ fontWeight: 800 }}>
+                        {topic.title}
+                    </Typography>
+                    {topic.flair && (
+                        <FlairBadge
+                            name={topic.flair.name}
+                            color={topic.flair.color}
+                            size={'medium'}
+                        />
+                    )}
+                </Stack>
                 <Typography
                     ref={descriptionRef}
                     variant={'body1'}

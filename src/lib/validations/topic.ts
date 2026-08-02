@@ -7,6 +7,10 @@ export const topicSchema = z.object({
     description: z
         .string()
         .min(10, { message: 'Description must be 10 or more characters long' }),
+    flairId: z
+        .number()
+        .nullable()
+        .optional(),
 });
 
 export type TopicInput = z.infer<typeof topicSchema>;

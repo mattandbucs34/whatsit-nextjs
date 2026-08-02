@@ -1,21 +1,32 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import { topicSchema, TopicInput } from '@/lib/validations/topic';
 import { createTopicAction } from '../action';
+import { fetchFlairsAction } from '@/app/flairs/action';
+import { FlairBadge } from '@/components/flairs/FlairBadge';
 
 const NewTopicPage = () => {
+    const [flairsList, setFlairsList] = useState<{ id: number; name: string | null; color?: string | null }[]>([]);
+
+    useEffect(() => {
+        fetchFlairsAction().then(setFlairsList).catch(console.error);
+    }, []);
+
     const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<TopicInput>({
         resolver: zodResolver(topicSchema),
         defaultValues: {
             title: '',
             description: '',
+            flairId: null,
         },
     });
 
@@ -59,6 +70,31 @@ const NewTopicPage = () => {
                             error={!!errors.description}
                             helperText={errors.description ? errors.description.message : 'Description must be 10 or more characters long'}
                         />
+                    )}
+                />
+
+                <Controller
+                    name={'flairId'}
+                    control={control}
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            select
+                            label={'Topic Flair (Optional)'}
+                            variant={'outlined'}
+                            fullWidth={true}
+                            value={field.value ?? ''}
+                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                        >
+                            <MenuItem value={''}>None</MenuItem>
+                            {flairsList.map((flair) => (
+                                <MenuItem key={flair.id} value={flair.id}>
+                                    <Stack direction={'row'} spacing={1} alignItems={'center'}>
+                                        <FlairBadge name={flair.name} color={flair.color} size={'small'} />
+                                    </Stack>
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     )}
                 />
 

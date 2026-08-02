@@ -8,6 +8,10 @@ vi.mock('@/auth', () => ({
     auth: vi.fn(),
 }));
 
+vi.mock('next/cache', () => ({
+    revalidatePath: vi.fn(),
+}));
+
 describe('Vote Server Actions', () => {
     let testUserId: number;
     let testPostId: number;
