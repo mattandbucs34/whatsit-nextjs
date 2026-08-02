@@ -22,6 +22,7 @@ import { deleteTopicAction, createPostAction } from '../action';
 import { postSchema, PostInput } from '@/lib/validations/post';
 import { CommentsSection } from '@/components/comments/CommentsSection';
 import { IPost } from '@/interfaces/IPost';
+import { VoteControl } from '@/components/votes/VoteControl';
 
 
 interface SingleTopicPageClientProps {
@@ -252,67 +253,83 @@ const SingleTopicPageClient = ({ topic, currentUser }: SingleTopicPageClientProp
             <Stack spacing={2} mt={2}>
                 {topic.posts && [...topic.posts]
                     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                    .map((post) => (
-                        <Card
-                            key={post.id}
-                            variant={'outlined'}
-                            sx={{
-                                background: 'rgba(22, 27, 34, 0.2)',
-                                border: '1px solid',
-                                borderColor: 'divider',
-                                borderRadius: 1,
-                            }}
-                        >
-                            <CardContent>
-                                <Stack direction={'column'} spacing={0.5}>
+                    .map((post) => {
+                        const currentUserId = currentUser ? parseInt(currentUser.id, 10) : undefined;
+                        const initialScore = post.votes ? post.votes.reduce((sum, v) => sum + v.value, 0) : 0;
+                        const initialUserVote = (currentUserId && post.votes)
+                            ? post.votes.find((v) => v.userId === currentUserId)?.value || 0
+                            : 0;
+
+                        return (
+                            <Card
+                                key={post.id}
+                                variant={'outlined'}
+                                sx={{
+                                    background: 'rgba(22, 27, 34, 0.2)',
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: 1,
+                                }}
+                            >
+                                <CardContent>
+                                    <Stack direction={'column'} spacing={0.5}>
+                                        <Typography 
+                                            component={NextLink} 
+                                            href={`/topics/${topic.id}/posts/${post.id}`}
+                                            variant={'h6'}
+                                            sx={{ 
+                                                fontWeight: 600, 
+                                                textDecoration: 'none', 
+                                                color: 'primary.main',
+                                                display: 'inline-block',
+                                                '&:hover': {
+                                                    textDecoration: 'underline',
+                                                }
+                                            }}
+                                        >
+                                            {post.title}
+                                        </Typography>
+                                        <Typography variant={'caption'} color={'text.secondary'}>
+                                            Posted on {new Date(post.createdAt).toLocaleDateString(undefined, { 
+                                                year: 'numeric', 
+                                                month: 'long', 
+                                                day: 'numeric' 
+                                            })}
+                                        </Typography>
+                                    </Stack>
+
                                     <Typography 
-                                        component={NextLink} 
-                                        href={`/topics/${topic.id}/posts/${post.id}`}
-                                        variant={'h6'}
+                                        variant={'body2'} 
+                                        color={'text.secondary'}
                                         sx={{ 
-                                            fontWeight: 600, 
-                                            textDecoration: 'none', 
-                                            color: 'primary.main',
-                                            display: 'inline-block',
-                                            '&:hover': {
-                                                textDecoration: 'underline',
-                                            }
+                                            mt: 1.5,
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 3,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
                                         }}
                                     >
-                                        {post.title}
+                                        {post.body}
                                     </Typography>
-                                    <Typography variant={'caption'} color={'text.secondary'}>
-                                        Posted on {new Date(post.createdAt).toLocaleDateString(undefined, { 
-                                            year: 'numeric', 
-                                            month: 'long', 
-                                            day: 'numeric' 
-                                        })}
-                                    </Typography>
-                                </Stack>
-                                <Typography 
-                                    variant={'body2'} 
-                                    color={'text.secondary'}
-                                    sx={{ 
-                                        mt: 1.5,
-                                        display: '-webkit-box',
-                                        WebkitLineClamp: 3,
-                                        WebkitBoxOrient: 'vertical',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                    }}
-                                >
-                                    {post.body}
-                                </Typography>
 
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                                    <Button
-                                        size={'small'}
-                                        onClick={() => toggleComments(post.id)}
-                                        sx={{ textTransform: 'none', color: 'primary.main', fontWeight: 600 }}
-                                    >
-                                        {expandedComments[post.id] ? 'Hide Comments' : `Comments (${post.comments?.length || 0})`}
-                                    </Button>
-                                </Box>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                                        <VoteControl
+                                            postId={post.id}
+                                            initialScore={initialScore}
+                                            initialUserVote={initialUserVote}
+                                            currentUser={currentUser}
+                                            topicId={topic.id}
+                                            size={'small'}
+                                        />
+                                        <Button
+                                            size={'small'}
+                                            onClick={() => toggleComments(post.id)}
+                                            sx={{ textTransform: 'none', color: 'primary.main', fontWeight: 600 }}
+                                        >
+                                            {expandedComments[post.id] ? 'Hide Comments' : `Comments (${post.comments?.length || 0})`}
+                                        </Button>
+                                    </Box>
 
                                 <Collapse in={!!expandedComments[post.id]} timeout={'auto'} unmountOnExit={true}>
                                     <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
@@ -321,7 +338,8 @@ const SingleTopicPageClient = ({ topic, currentUser }: SingleTopicPageClientProp
                                 </Collapse>
                             </CardContent>
                         </Card>
-                    ))}
+                    );
+                })}
 
                 {(!topic.posts || topic.posts.length === 0) && (
                     <Typography color={'text.secondary'}>

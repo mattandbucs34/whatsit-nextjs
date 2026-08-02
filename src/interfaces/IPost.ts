@@ -8,6 +8,12 @@ export interface IPost {
     userId: number;
     createdAt: string;
     updatedAt: string;
+    votes?: {
+        id: number;
+        value: number;
+        userId: number;
+        postId: number;
+    }[];
 }
 
 export interface IPostWithComments extends IPost {

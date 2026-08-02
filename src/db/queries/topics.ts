@@ -13,6 +13,7 @@ export const getTopic = async (id: number) => {
         with: {
             posts: {
                 with: {
+                    votes: true,
                     comments: {
                         columns: {
                             id: true,

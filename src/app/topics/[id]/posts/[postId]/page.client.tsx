@@ -20,6 +20,8 @@ import { postSchema, PostInput } from '@/lib/validations/post';
 import { updatePostAction, deletePostAction } from '@/app/topics/action';
 import { CommentsSection } from '@/components/comments/CommentsSection';
 
+import { VoteControl } from '@/components/votes/VoteControl';
+
 // Strong typing for the post object returned from Drizzle query
 interface SinglePostPageClientProps {
     post: {
@@ -33,6 +35,12 @@ interface SinglePostPageClientProps {
         user: {
             email: string;
         } | null;
+        votes?: {
+            id: number;
+            value: number;
+            userId: number;
+            postId: number;
+        }[];
         comments?: {
             id: number;
             body: string;
@@ -95,6 +103,12 @@ const SinglePostPageClient = ({ post, topicId, currentUser }: SinglePostPageClie
         }
     };
 
+    const initialScore = post.votes ? post.votes.reduce((sum, v) => sum + v.value, 0) : 0;
+    const currentUserId = currentUser ? parseInt(currentUser.id, 10) : undefined;
+    const initialUserVote = (currentUserId && post.votes)
+        ? post.votes.find((v) => v.userId === currentUserId)?.value || 0
+        : 0;
+
     return (
         <Container maxWidth={'md'}>
             <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'} mb={4}>
@@ -148,11 +162,11 @@ const SinglePostPageClient = ({ post, topicId, currentUser }: SinglePostPageClie
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
-                                        label={'Post Title'}
-                                        variant={'outlined'}
-                                        fullWidth={true}
+                                        label={'Title'}
+                                        fullWidth
                                         error={!!errors.title}
-                                        helperText={errors.title ? errors.title.message : ''}
+                                        helperText={errors.title?.message}
+                                        disabled={isSubmitting}
                                     />
                                 )}
                             />
@@ -163,13 +177,13 @@ const SinglePostPageClient = ({ post, topicId, currentUser }: SinglePostPageClie
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
-                                        label={'Post Body'}
-                                        variant={'outlined'}
-                                        multiline={true}
+                                        label={'Content'}
+                                        fullWidth
+                                        multiline
                                         rows={6}
-                                        fullWidth={true}
                                         error={!!errors.body}
-                                        helperText={errors.body ? errors.body.message : ''}
+                                        helperText={errors.body?.message || 'Tip: Press Ctrl + Enter to quickly save'}
+                                        disabled={isSubmitting}
                                     />
                                 )}
                             />
@@ -216,6 +230,17 @@ const SinglePostPageClient = ({ post, topicId, currentUser }: SinglePostPageClie
                             <Typography variant={'body1'} color={'text.primary'} sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>
                                 {post.body}
                             </Typography>
+
+                            <Box sx={{ pt: 2, display: 'flex', alignItems: 'center' }}>
+                                <VoteControl
+                                    postId={post.id}
+                                    initialScore={initialScore}
+                                    initialUserVote={initialUserVote}
+                                    currentUser={currentUser}
+                                    topicId={topicId}
+                                    size={'medium'}
+                                />
+                            </Box>
                         </Stack>
                     )}
                 </CardContent>
