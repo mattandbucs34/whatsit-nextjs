@@ -55,9 +55,11 @@ jobs:
                   username: ${{ secrets.LIGHTSAIL_USERNAME }}
                   key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
                   script: |
+                      source ~/.profile || source ~/.bashrc || true
+                      export PATH=$PATH:/usr/local/bin:$HOME/.nvm/versions/node/$(ls $HOME/.nvm/versions/node 2>/dev/null | tail -n 1)/bin:$HOME/.pnpm:$HOME/.local/share/pnpm
                       cd /var/www/whatsit-nextjs
                       git pull origin main
                       pnpm install
                       npx drizzle-kit push --force
                       pnpm build
-                      pm2 restart ecosystem.config.cjs --env production
+                      npx pm2 restart ecosystem.config.cjs --env production
