@@ -37,6 +37,11 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
+            - name: Run database migrations for CI testing
+              env:
+                  DATABASE_URL: postgres://whatsit_user:password123@localhost:5432/whatsit_test
+              run: npx drizzle-kit migrate
+
             - name: Run unit tests
               env:
                   DATABASE_URL: postgres://whatsit_user:password123@localhost:5432/whatsit_test
