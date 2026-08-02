@@ -6,6 +6,7 @@ dotenv.config({ path: '.env.test' });
 
 export default defineConfig({
     test: {
-        // any extra configurations
+        // Prevent concurrent DB wiping across test files
+        fileParallelism: false,
     },
 });
